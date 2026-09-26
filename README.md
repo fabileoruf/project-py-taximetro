@@ -31,4 +31,14 @@ Ejemplo: 60 s parado + 120 s en movimiento = 1,20 € + 6,00 € = 7,20 €.
 - Fase 3: separación de responsabilidades, contraseña e interfaz táctil.
 - Fase 4: SQLite, API REST, panel web y despliegue con un comando.
 
+## Fase 2 — Persistencia y configuración
+
+`h` muestra el historial. Las carreras se guardan en `data/history.jsonl` y
+los eventos en `data/operations.jsonl`, con rotación. `TAXIMETRO_DATA` permite
+elegir otra carpeta. `data/` no se sube al repositorio.
+
+Modifica `config.json` para cambiar tarifas sin tocar código. Se aplican a
+la siguiente carrera; una carrera activa conserva las tarifas iniciales.
+Si el archivo es inválido, se informa del error y no comienza la carrera.
+
 Las tarifas son datos del ejercicio; este prototipo no es un taxímetro homologado.
