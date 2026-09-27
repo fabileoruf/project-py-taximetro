@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="{{ csrf }}">
+  <title>Taxímetro · TaxiTech</title>
+  <link rel="icon" href="{{ url_for('static', filename='favicon.svg') }}" type="image/svg+xml">
+  <link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}">
+  <script defer src="{{ url_for('static', filename='app.js') }}"></script>
+</head>
+<body>
+  <header class="site-header"><div class="header-inner">
+    <a href="/" class="brand" aria-label="TaxiTech, inicio"><span class="brand-mark" aria-hidden="true">t.</span>taxitech<span class="brand-dot">.</span></a>
+    <nav aria-label="Principal"><a class="nav-active" href="#taximeter">Taxímetro</a><a href="#history">Historial</a></nav>
+    <button id="logout" class="text-button">Cerrar sesión <span aria-hidden="true">↗</span></button>
+  </div></header>
+  <main class="page">
+    <div class="page-heading"><div><p class="eyebrow">PANEL DE CONDUCCIÓN</p><h1>Un nuevo trayecto.<br><span>Todo bajo control.</span></h1></div><div class="date-block"><span class="connection"><i></i><span id="connection">Conectando…</span></span><p id="today">—</p></div></div>
+    <div id="error" class="notice error" role="alert" hidden></div>
+    <div id="receipt" class="notice success" role="status" hidden></div>
+    <div class="workspace">
+      <section id="taximeter" class="meter-card" aria-labelledby="meter-title">
+        <div class="card-heading"><h2 id="meter-title">Taxímetro</h2><span id="state-badge" class="badge">DISPONIBLE</span></div>
+        <div class="fare-display"><span class="fare-label">IMPORTE DE LA CARRERA</span><div class="fare"><span id="fare">0,00</span><span class="currency">€</span></div><div class="trip-meta"><span><span class="mini-label">TIEMPO</span><strong id="duration">00:00</strong></span><span><span class="mini-label">TARIFA ACTUAL</span><strong id="current-rate">— €/s</strong></span></div></div>
+        <fieldset class="state-controls"><legend>Estado del vehículo</legend><button id="stopped" class="state-button" aria-pressed="false" disabled><span class="state-icon" aria-hidden="true">Ⅱ</span><span>Parado<small>En espera o menos de 20 km/h</small></span><span class="selection-dot"></span></button><button id="moving" class="state-button" aria-pressed="false" disabled><span class="state-icon" aria-hidden="true">↗</span><span>En movimiento<small>Circulando a 20 km/h o más</small></span><span class="selection-dot"></span></button></fieldset>
+        <button id="start" class="button primary" disabled>Iniciar carrera <span aria-hidden="true">↗</span></button>
+        <button id="finish" class="button dark" hidden>Finalizar carrera <span aria-hidden="true">✓</span></button>
+        <p id="meter-hint" class="meter-hint">La carrera comienza en parado. Cambia el estado mientras conduces.</p>
+      </section>
+      <aside class="side-panels" aria-label="Resumen del turno">
+        <section class="summary-card"><div class="card-heading"><h2>Tu día, en cifras</h2><span class="tiny-tag">HOY</span></div><div class="day-total"><span id="total-today">0,00</span><span>€</span></div><p class="muted">Total de carreras cerradas</p><div class="summary-bottom"><span>Carreras registradas</span><strong id="trips-today">0</strong></div></section>
+        <section class="rates-card"><p class="eyebrow">CLARO DESDE EL PRINCIPIO</p><h2>Cada segundo cuenta.</h2><p>El importe se calcula por tiempo, según el estado del vehículo.</p><div class="rate-row"><span>Parado</span><strong><span id="stopped-rate">0,02</span> <small>€/s</small></strong></div><div class="rate-row"><span>En movimiento</span><strong><span id="moving-rate">0,05</span> <small>€/s</small></strong></div><p class="rates-note">Cada carrera conserva las tarifas con las que comenzó.</p></section>
+      </aside>
+    </div>
+    <section id="history" class="history-card" aria-labelledby="history-title"><div class="history-heading"><div><p class="eyebrow">CADA TRAYECTO, GUARDADO</p><h2 id="history-title">Historial de carreras</h2></div><div class="history-filters"><label for="history-date">Fecha</label><input id="history-date" type="date"><button id="all-trips" class="text-button">Ver todas</button></div></div><div class="table-scroll"><table><thead><tr><th scope="col">Carrera</th><th scope="col">Fecha y hora</th><th scope="col">Duración</th><th scope="col">Estado</th><th scope="col" class="align-right">Importe</th></tr></thead><tbody id="history-body"></tbody></table></div><div id="empty-history" class="empty-history"><span aria-hidden="true">↗</span><h3>Tu próximo trayecto empieza aquí.</h3><p>Las carreras cerradas aparecerán en este historial.</p></div></section>
+    <footer class="page-footer"><span>TAXITECH SOLUTIONS</span><span>Proyecto educativo · Fabiana Leonardo · Factoría F5</span><span>Hecho con Python</span></footer>
+  </main>
+</body>
+</html>

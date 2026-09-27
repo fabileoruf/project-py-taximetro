@@ -1,11 +1,12 @@
-"""Interfaz de terminal de la fase 1."""
+"""Interfaz de terminal sobre los mismos casos de uso de la interfaz web."""
 
-from .domain import Taximeter
-from .config import ROOT, load_rates
-from .events import EventLog
-from .storage import JsonHistory
 import os
 from pathlib import Path
+
+from .config import ROOT
+from .events import EventLog
+from .service import MeterService
+from .storage import JsonHistory
 
 HELP = """
 TAXITECH · Taxímetro digital
@@ -17,13 +18,17 @@ Cada carrera empieza en estado parado. Pulsa Enter después del comando.
 """
 
 
+def display(trip):
+    state = "parado" if trip["state"] == "stopped" else "en movimiento"
+    print(f"{state} · {trip['duration_seconds']:.1f} s · {trip['total']} €")
+
+
 def run():
     print(HELP)
     directory = Path(os.environ.get("TAXIMETRO_DATA", ROOT / "data"))
-    history = JsonHistory(directory)
     events = EventLog(directory)
-    events.write("startup", interface="cli")
-    meter = None
+    service = MeterService(JsonHistory(directory), events,
+                           os.environ.get("TAXIMETRO_CONFIG", ROOT / "config.json"))
     while True:
         try:
             command = input("taxi> ").strip().lower()
@@ -33,36 +38,28 @@ def run():
             if command == "a":
                 print(HELP)
             elif command == "i":
-                if meter:
-                    raise ValueError("Finaliza la carrera actual antes de iniciar otra.")
-                meter = Taximeter(load_rates())
-                events.write("trip_started", trip_id=meter.id)
-                print(f"Carrera iniciada. Parado: {meter.rates.stopped} €/s; movimiento: {meter.rates.moving} €/s.")
-            elif command in ("p", "m", "e", "f"):
-                if not meter:
-                    raise ValueError("Primero inicia una carrera con i.")
-                if command in ("p", "m"):
-                    meter.change_state("stopped" if command == "p" else "moving")
-                    events.write("state_changed", trip_id=meter.id, state=meter.state)
-                result = meter.finish() if command == "f" else meter.snapshot()
-                print(f"{result['state']} · {result['duration_seconds']:.1f} s · {result['total']} €")
-                if command == "f":
-                    history.save(result)
-                    events.write("trip_finished", trip_id=meter.id, total=result["total"])
-                    meter = None
-                    print("Carrera finalizada. Puedes iniciar otra con i.")
+                trip = service.start()
+                print(f"Carrera iniciada. Parado: {trip['rates']['stopped']} €/s; movimiento: {trip['rates']['moving']} €/s.")
+            elif command in ("p", "m"):
+                display(service.change("stopped" if command == "p" else "moving"))
+            elif command == "e":
+                trip = service.status()["active"]
+                if trip:
+                    display(trip)
+                else:
+                    print("No hay ninguna carrera activa. Inicia una con i.")
+            elif command == "f":
+                display(service.finish())
+                print("Carrera finalizada y guardada. Puedes iniciar otra con i.")
             elif command == "h":
-                rows = history.all()
+                rows = service.history()
                 for row in rows:
                     print(f"{row['started_at']} · {row['duration_seconds']:.1f} s · {row['total']} €")
                 if not rows:
                     print("Todavía no hay carreras guardadas.")
             elif command == "q":
-                if meter:
-                    result = meter.finish()
-                    history.save(result)
-                    events.write("trip_finished", trip_id=meter.id, total=result["total"])
-                    print(f"Carrera finalizada al salir: {result['total']} €")
+                if service.meter:
+                    print(f"Carrera finalizada al salir: {service.finish()['total']} €")
                 print("Hasta pronto.")
                 break
             else:
@@ -70,3 +67,5 @@ def run():
         except (ValueError, OSError) as error:
             events.write("error", message=str(error))
             print(f"Aviso: {error}")
+            if command == "q":
+                raise

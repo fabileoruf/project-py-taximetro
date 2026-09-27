@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Acceso · TaxiTech</title>
+  <link rel="icon" href="{{ url_for('static', filename='favicon.svg') }}" type="image/svg+xml">
+  <link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}">
+</head>
+<body class="login-page">
+  <main class="login-shell">
+    <div class="brand"><span class="brand-mark" aria-hidden="true">t.</span>taxitech<span class="brand-dot">.</span></div>
+    <div class="eyebrow">TU TURNO EMPIEZA AQUÍ</div>
+    <h1>Todo listo para<br>el próximo trayecto.</h1>
+    <p class="muted">Accede a tu taxímetro y lleva el control de cada carrera.</p>
+    <form method="post" action="/login" class="login-form">
+      <input type="hidden" name="csrf" value="{{ csrf }}">
+      <label for="password">Contraseña</label>
+      <input id="password" name="password" type="password" autocomplete="current-password" required maxlength="256" autofocus placeholder="Tu contraseña de acceso">
+      {% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+      <button class="button primary" type="submit">Entrar al taxímetro <span aria-hidden="true">↗</span></button>
+    </form>
+    <p class="login-footer">TAXITECH SOLUTIONS <span>Proyecto educativo · Python</span></p>
+  </main>
+  <div class="login-art" aria-hidden="true"><div class="road-line"></div><div class="taxi-tile">TAXI<span>Siempre en marcha.</span></div><div class="art-caption">CADA SEGUNDO CUENTA.</div></div>
+</body>
+</html>
