@@ -6,7 +6,7 @@ import unittest
 from taximetro.events import EventLog
 from taximetro.security import create_credentials
 from taximetro.service import MeterService
-from taximetro.storage import JsonHistory
+from taximetro.database import SQLiteHistory
 from taximetro.web import create_app
 from taximetro.domain import Taximeter
 from test_domain import Clock
@@ -25,7 +25,7 @@ class WebTests(unittest.TestCase):
         self.directory = Path(self.temp.name)
         (self.directory / "credentials.json").write_text(json.dumps(self.credentials))
         self.clock = Clock()
-        self.service = MeterService(JsonHistory(self.directory), EventLog(self.directory),
+        self.service = MeterService(SQLiteHistory(self.directory), EventLog(self.directory),
                                     factory=lambda rates: Taximeter(rates, self.clock))
         self.app = create_app(self.directory, self.service)
         self.app.config["TESTING"] = True

@@ -1,0 +1,14 @@
+[
+  {"phase": 1, "title": "F1 · Flujo de terminal y carreras consecutivas", "evidence": "Etiqueta fase-1; taximeter.py y taximetro/cli.py.", "progress": "Hecho"},
+  {"phase": 1, "title": "F1 · Cálculo por tramos y redondeo decimal", "evidence": "taximetro/domain.py; caso 60 s + 120 s = 7,20 euros.", "progress": "Hecho"},
+  {"phase": 1, "title": "F1 · Pruebas del núcleo de cálculo", "evidence": "tests/test_domain.py: 7 casos con reloj controlado.", "progress": "Hecho"},
+  {"phase": 2, "title": "F2 · Historial incremental en JSONL", "evidence": "Etiqueta fase-2; taximetro/storage.py y tests/test_storage.py.", "progress": "Hecho"},
+  {"phase": 2, "title": "F2 · Eventos estructurados con rotación", "evidence": "taximetro/events.py; datos locales excluidos de Git.", "progress": "Hecho"},
+  {"phase": 2, "title": "F2 · Tarifas externas y validación", "evidence": "config.json y taximetro/config.py; nuevas tarifas para la siguiente carrera.", "progress": "Hecho"},
+  {"phase": 3, "title": "F3 · Servicio compartido y responsabilidades", "evidence": "Etiqueta fase-3; MeterService compartido por terminal y web.", "progress": "Hecho"},
+  {"phase": 3, "title": "F3 · Contraseña y sesiones protegidas", "evidence": "Hash scrypt, sesión, CSRF y límite de intentos; tests/test_web.py.", "progress": "Hecho"},
+  {"phase": 3, "title": "F3 · Interfaz de ordenador, tablet y móvil", "evidence": "tests/browser_check.py; capturas en docs/images; flujo y reconexión verificados.", "progress": "Hecho"},
+  {"phase": 4, "title": "F4 · SQLite, migración y recuperación", "evidence": "taximetro/database.py; tests/test_database.py: 10 casos.", "progress": "Hecho"},
+  {"phase": 4, "title": "F4 · API y arranque con un comando Python", "evidence": "python3 iniciar.py; docs/api.md; tests/native_check.py verifica reinicio.", "progress": "Hecho"},
+  {"phase": 4, "title": "F4 · Memoria PDF y guía de presentación", "evidence": "docs/memoria-taximetro.pdf, docs/demo.md y docs/entrega.md.", "progress": "Hecho"}
+]

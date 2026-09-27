@@ -40,6 +40,10 @@ function controls() {
 
 function render(data) {
   current = data;
+  if (data.recovered_trip) {
+    $("recovery").textContent = `Se recuperó una carrera interrumpida tras reiniciar: ${euros(data.recovered_trip.total)} € hasta el último registro. Revisa el historial antes de cobrar.`;
+    $("recovery").hidden = false;
+  }
   const trip = data.active;
   $("fare").textContent = euros(trip?.total || 0);
   $("duration").textContent = duration(trip?.duration_seconds || 0);

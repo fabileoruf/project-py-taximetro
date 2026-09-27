@@ -14,7 +14,7 @@ from .config import ROOT
 from .events import EventLog
 from .security import load_credentials, verify
 from .service import Conflict, MeterService
-from .storage import JsonHistory
+from .database import SQLiteHistory
 
 
 def create_app(directory=None, service=None):
@@ -28,7 +28,7 @@ def create_app(directory=None, service=None):
         PERMANENT_SESSION_LIFETIME=timedelta(hours=8),
     )
     events = EventLog(directory)
-    service = service or MeterService(JsonHistory(directory), events,
+    service = service or MeterService(SQLiteHistory(directory), events,
                                      os.environ.get("TAXIMETRO_CONFIG", ROOT / "config.json"))
     app.extensions["meter_service"] = service
     failures = {}

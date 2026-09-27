@@ -18,7 +18,7 @@ from taximetro.domain import Taximeter
 from taximetro.events import EventLog
 from taximetro.security import create_credentials
 from taximetro.service import MeterService
-from taximetro.storage import JsonHistory
+from taximetro.database import SQLiteHistory
 from taximetro.web import create_app
 from test_domain import Clock
 
@@ -30,7 +30,7 @@ def run():
         password = secrets.token_urlsafe(20)
         create_credentials(directory, password)
         clock = Clock()
-        service = MeterService(JsonHistory(directory), EventLog(directory),
+        service = MeterService(SQLiteHistory(directory), EventLog(directory),
                                 factory=lambda rates: Taximeter(rates, clock))
         server = make_server("127.0.0.1", 0, create_app(directory, service), threaded=True)
         thread = Thread(target=server.serve_forever, daemon=True)

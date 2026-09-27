@@ -6,7 +6,8 @@ from pathlib import Path
 from .config import ROOT
 from .events import EventLog
 from .service import MeterService
-from .storage import JsonHistory
+from .database import SQLiteHistory
+import sqlite3
 
 HELP = """
 TAXITECH · Taxímetro digital
@@ -27,8 +28,10 @@ def run():
     print(HELP)
     directory = Path(os.environ.get("TAXIMETRO_DATA", ROOT / "data"))
     events = EventLog(directory)
-    service = MeterService(JsonHistory(directory), events,
+    service = MeterService(SQLiteHistory(directory), events,
                            os.environ.get("TAXIMETRO_CONFIG", ROOT / "config.json"))
+    if service.recovered:
+        print("Se ha recuperado una carrera interrumpida hasta su último registro. Consulta h.")
     while True:
         try:
             command = input("taxi> ").strip().lower()
@@ -64,7 +67,7 @@ def run():
                 break
             else:
                 print("Comando desconocido. Escribe a para ver la ayuda.")
-        except (ValueError, OSError) as error:
+        except (ValueError, OSError, sqlite3.Error) as error:
             events.write("error", message=str(error))
             print(f"Aviso: {error}")
             if command == "q":

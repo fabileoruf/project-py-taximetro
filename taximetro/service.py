@@ -23,13 +23,22 @@ class MeterService:
         self.factory = factory
         self.meter = None
         self.lock = RLock()
+        self.recovered = history.recover() if hasattr(history, "recover") else None
+        if self.recovered:
+            events.write("trip_recovered", trip_id=self.recovered["id"], status="interrupted")
         events.write("startup")
+
+    def _checkpoint(self, trip):
+        if hasattr(self.repository, "checkpoint"):
+            self.repository.checkpoint(trip)
 
     def start(self):
         with self.lock:
             if self.meter:
                 raise Conflict("Ya hay una carrera activa. Finalízala antes de iniciar otra.")
-            self.meter = self.factory(load_rates(self.config_path))
+            meter = self.factory(load_rates(self.config_path))
+            self._checkpoint(meter.snapshot())
+            self.meter = meter
             self.events.write("trip_started", trip_id=self.meter.id)
             return self.meter.snapshot()
 
@@ -38,6 +47,7 @@ class MeterService:
             if not self.meter:
                 raise Conflict("Primero inicia una carrera.")
             self.meter.change_state(state)
+            self._checkpoint(self.meter.snapshot())
             self.events.write("state_changed", trip_id=self.meter.id, state=state)
             return self.meter.snapshot()
 
@@ -66,8 +76,11 @@ class MeterService:
             today = datetime.now(MADRID).date().isoformat()
             rows = self.history(today)
             rates = self.meter.rates if self.meter else load_rates(self.config_path)
+            active = self.meter.snapshot() if self.meter else None
+            if active:
+                self._checkpoint(active)
             return {
-                "active": self.meter.snapshot() if self.meter else None,
+                "active": active, "recovered_trip": self.recovered,
                 "rates": {"stopped": str(rates.stopped), "moving": str(rates.moving)},
                 "today": today, "trips_today": len(rows),
                 "total_today": str(sum((Decimal(row["total"]) for row in rows), Decimal("0.00"))),

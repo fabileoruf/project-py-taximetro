@@ -4,6 +4,7 @@ import argparse
 from getpass import getpass
 import os
 from pathlib import Path
+import sqlite3
 
 from .config import ROOT
 from .lease import application_lock
@@ -34,7 +35,7 @@ def main():
                 app = create_app(directory)
                 print(f"TaxiTech disponible en http://{args.host}:{args.port}", flush=True)
                 serve(app, host=args.host, port=args.port, threads=4)
-    except (ValueError, OSError) as error:
+    except (ValueError, OSError, sqlite3.Error) as error:
         parser.exit(1, f"Error: {error}\n")
 
 
